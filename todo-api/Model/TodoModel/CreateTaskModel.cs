@@ -6,7 +6,8 @@
         public string TaskName { get; set; }
         public string TaskDescription { get; set; }
         public long UserId { get; set; }
+        public Boolean Status { get; set; }
         public DateTime ExpireDateTime { get; set; }
-        public DateTime CreationDateTine { get; set;}
+        public DateTime CreationDateTime { get; set;}
     }
 }

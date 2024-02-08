@@ -35,9 +35,9 @@ namespace todo_api.Services
             try
             {
                 var sql = "INSERT INTO [dbo].[tblTask] " +
-                          "([PriorityId],[TaskName],[TaskDescription],[UserId],[CreationDateTine],[ExpireDateTime],[isActive])" +
+                          "([PriorityId],[TaskName],[TaskDescription],[UserId],[CreationDateTime],[ExpireDateTime],[Status],[isActive])" +
                           "VALUES" +
-                          "(@PriorityId,@TaskName,@TaskDescription,@UserId,@ExpireDateTime,@CreationDateTine,1)";
+                          "(@PriorityId,@TaskName,@TaskDescription,@UserId,@CreationDateTime,@ExpireDateTime,@Status,1)";
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
