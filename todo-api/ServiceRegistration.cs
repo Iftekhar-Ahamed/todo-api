@@ -10,6 +10,7 @@ namespace todo_api
         {
             services.AddTransient<IAuthentication, AuthenticationRepository>();
             services.AddTransient<DbOperation>();
+            services.AddTransient<ITodo, TodoRepository>();
         }
     }
 }
