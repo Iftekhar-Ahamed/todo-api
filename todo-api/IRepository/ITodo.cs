@@ -6,7 +6,10 @@ namespace todo_api.IRepository
 {
     public interface ITodo
     {
-        Task<MessageHelperModel> CreateTaskAsync(CreateTaskModel createTaskModel);
-        Task<PaginationLandingModel> GetAllTaskByUserIdAsync(long UserId, string OrderBy, long PageNo, long PageSize);
+        Task<long> CreateTaskAsync(CreateTaskModel createTaskModel);
+        Task<List<GetAllTaskModel>> GetAllTaskByUserIdAsync(long UserId, string OrderBy, long PageNo, long PageSize);
+        Task<List<CommonDDL>> GetPriorityDDLAsync(string OrderBy);
+        Task<long> UpdateTaskByTaskIdAsync(UpdateTaskModel updateTaskModel);
+        Task<long> DeleteTaskByTaskIdAsync(long TaskId);
     }
 }

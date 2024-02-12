@@ -4,6 +4,7 @@
     {
         public int TaskId { get; set; }
         public long PriorityId { get; set; }
+        public string PriorityName { get; set; }
         public string TaskName { get; set; }
         public string TaskDescription { get; set; }
         public long UserId { get; set; }

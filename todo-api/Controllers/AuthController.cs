@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using todo_api.IRepository;
+using todo_api.IService;
 
 namespace todo_api.Controllers
 {
@@ -7,8 +8,8 @@ namespace todo_api.Controllers
     [Route("[controller]")]
     public class AuthController: ControllerBase
     {
-        private IAuthentication _IAuthentication;
-        public AuthController(IAuthentication athentication) {
+        private IAuthenticationService _IAuthentication;
+        public AuthController(IAuthenticationService athentication) {
             _IAuthentication = athentication;
         }
         [HttpGet]

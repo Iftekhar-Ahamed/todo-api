@@ -5,6 +5,6 @@ namespace todo_api.IRepository
 {
     public interface IAuthentication
     {
-        Task<(UserInfoModel, MessageHelperModel)> UserLogInAsync(string UserName, string PassWord);
+        Task<UserInfoModel?> UserLogInAsync(string UserName, string PassWord);
     }
 }
