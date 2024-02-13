@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using todo_api.Helper;
 using todo_api.IRepository;
 using todo_api.IService;
@@ -25,11 +26,12 @@ namespace todo_api.Controllers
         }
         [HttpGet]
         [Route("GetAllTaskByUserId")]
-        public async Task<IActionResult> GetAllTaskByUserId(long UserId,string? SearchTerm, [FromQuery] TaskSortingModel taskSorting, long PageNo, long PageSize)
+        public async Task<IActionResult> GetAllTaskByUserId(long UserId, string? SearchTerm, [FromQuery] TaskSortingModel taskSorting, long PageNo, long PageSize)
         {
-            var res = await _Itodo.GetAllTaskByUserIdAsync(UserId,SearchTerm, taskSorting, PageNo,PageSize);
+            var res = await _Itodo.GetAllTaskByUserIdAsync(UserId, SearchTerm, taskSorting, PageNo, PageSize);
             return Ok(res);
         }
+        [Authorize]
         [HttpGet]
         [Route("GetPriorityDDL")]
         public async Task<IActionResult> GetPriorityDDL(string OrderBy)
