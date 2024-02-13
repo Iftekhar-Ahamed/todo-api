@@ -2,6 +2,7 @@
 using todo_api.Helper;
 using todo_api.IRepository;
 using todo_api.IService;
+using todo_api.Model;
 using todo_api.Model.TodoModel;
 
 namespace todo_api.Controllers
@@ -24,9 +25,9 @@ namespace todo_api.Controllers
         }
         [HttpGet]
         [Route("GetAllTaskByUserId")]
-        public async Task<IActionResult> GetAllTaskByUserId(long UserId, string OrderBy, long PageNo, long PageSize)
+        public async Task<IActionResult> GetAllTaskByUserId(long UserId,string? SearchTerm, [FromQuery] TaskSortingModel taskSorting, long PageNo, long PageSize)
         {
-            var res = await _Itodo.GetAllTaskByUserIdAsync(UserId,OrderBy, PageNo,PageSize);
+            var res = await _Itodo.GetAllTaskByUserIdAsync(UserId,SearchTerm, taskSorting, PageNo,PageSize);
             return Ok(res);
         }
         [HttpGet]

@@ -27,9 +27,9 @@ namespace todo_api.Services
             return msg;
 
         }
-        public async Task<PaginationLandingModel> GetAllTaskByUserIdAsync(long UserId, string OrderBy, long PageNo, long PageSize)
+        public async Task<PaginationLandingModel> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm, TaskSortingModel taskSorting, long PageNo, long PageSize)
         {
-            var res = await db.GetAllTaskByUserIdAsync(UserId, OrderBy, PageNo, PageSize);
+            var res = await db.GetAllTaskByUserIdAsync(UserId,SearchTerm, taskSorting, PageNo, PageSize);
             PaginationLandingModel pagination = new PaginationLandingModel(res, PageNo, res.Count, PageSize);
             return pagination;
         }

@@ -38,7 +38,7 @@ namespace todo_api.Repository
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<List<GetAllTaskModel>> GetAllTaskByUserIdAsync(long UserId, string OrderBy, long PageNo, long PageSize)
+        public async Task<List<GetAllTaskModel>> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm,TaskSortingModel? taskSorting, long PageNo, long PageSize)
         {
             try
             {
@@ -50,8 +50,37 @@ namespace todo_api.Repository
                          "t.ExpireDateTime as ExpireDateTime, t.CreationDateTime as CreationDateTime, t.Status as Status " +
                          "FROM dbo.tblTask as t " +
                          "INNER JOIN dbo.tblPriority as p on t.PriorityId = p.Priority " +
-                         "WHERE t.UserId = @UserId AND t.isActive = 1 " +
-                         "ORDER BY t.CreationDateTime " + OrderBy;
+                         "WHERE t.UserId = @UserId AND t.isActive = 1  ";
+                if (SearchTerm != null)
+                {
+                    sql += "AND t.TaskName Like '%"+SearchTerm+"%'";
+                }
+                    if (taskSorting != null && (taskSorting.Priority != null || taskSorting.creationDate != null || taskSorting.Status!= null))
+                {
+                    sql += "ORDER BY ";
+                    bool add = false;
+                    if (taskSorting.Status != null)
+                    {
+                        if (add) sql += " ,";
+                        sql += " t.Status " + taskSorting.Status;
+                        add = true;
+                    }
+                    if (taskSorting.Priority != null)
+                    {
+                        if (add) sql += " ,";
+                        sql += " t.PriorityId " + taskSorting.Priority;
+                        add = true;
+                    }
+                    if (taskSorting.creationDate != null)
+                    {
+                        if (add) sql += " ,";
+                        sql += "t.CreationDateTime "+taskSorting.creationDate;
+                        add = true;
+                    }
+                    
+                    
+                }
+                         
 
                 if (OFFSET != 0 && FETCH != 0)
                 {
@@ -61,7 +90,7 @@ namespace todo_api.Repository
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     connection.Open();
-                    var res = await connection.QueryAsync<GetAllTaskModel>(sql, new { UserId, OFFSET, FETCH });
+                    var res = await connection.QueryAsync<GetAllTaskModel>(sql, new { UserId, OFFSET, FETCH,taskSorting?.Priority,taskSorting?.creationDate, taskSorting?.Status,SearchTerm });
                     return res.ToList();
                 }
 
