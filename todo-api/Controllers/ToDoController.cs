@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using todo_api.Helper;
-using todo_api.IRepository;
 using todo_api.IService;
 using todo_api.Model;
 using todo_api.Model.TodoModel;
 
 namespace todo_api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ToDoController: ControllerBase
@@ -31,7 +30,6 @@ namespace todo_api.Controllers
             var res = await _Itodo.GetAllTaskByUserIdAsync(UserId, SearchTerm, taskSorting, PageNo, PageSize);
             return Ok(res);
         }
-        [Authorize]
         [HttpGet]
         [Route("GetPriorityDDL")]
         public async Task<IActionResult> GetPriorityDDL(string OrderBy)
@@ -49,7 +47,7 @@ namespace todo_api.Controllers
         }
         [HttpPost]
         [Route("DeleteTaskByTaskId")]
-        public async Task<IActionResult> DeleteTaskByTaskId( long TaskId)
+        public async Task<IActionResult> DeleteTaskByTaskId( [FromBody]long TaskId)
         {
             var res = await _Itodo.DeleteTaskByTaskIdAsync(TaskId);
             return Ok(res);

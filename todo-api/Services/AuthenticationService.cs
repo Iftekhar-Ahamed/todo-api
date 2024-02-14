@@ -46,27 +46,20 @@ namespace todo_api.Services
         }
         public string GenerateToken(UserInfoModel user)
         {
-            var claims = new[] {
-                        new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]??string.Empty),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                        new Claim("UserId", user.UserId.ToString()),
-            };
+            var claims = new List<Claim>{new Claim(ClaimTypes.Name, user.FirstName)};
 
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? string.Empty));
-            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
-                claims,
-                expires: DateTime.UtcNow.AddMinutes(50),
-                signingCredentials: signIn);
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: creds
+            );
 
-            var tk = new JwtSecurityTokenHandler().WriteToken(token);
-            return tk;
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
