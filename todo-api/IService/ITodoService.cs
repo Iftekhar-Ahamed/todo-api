@@ -1,6 +1,7 @@
 ﻿using todo_api.Helper;
 using todo_api.Model.TodoModel;
 using todo_api.Model;
+using todo_api.Model.ReportModel;
 
 namespace todo_api.IService
 {
@@ -11,5 +12,6 @@ namespace todo_api.IService
         Task<List<CommonDDL>> GetPriorityDDLAsync(string OrderBy);
         Task<MessageHelperModel> UpdateTaskByTaskIdAsync(UpdateTaskModel updateTaskModel);
         Task<MessageHelperModel> DeleteTaskByTaskIdAsync(long TaskId);
+        Task<TaskReportModel> UserTaskReport(long UserId);
     }
 }

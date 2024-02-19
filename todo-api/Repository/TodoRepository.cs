@@ -1,10 +1,15 @@
-﻿using Dapper;
+﻿using Azure.Core;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Data;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using todo_api.Helper;
 using todo_api.IRepository;
 using todo_api.Model;
 using todo_api.Model.AuthModel;
+using todo_api.Model.ReportModel;
 using todo_api.Model.TodoModel;
 using todo_api.Services;
 namespace todo_api.Repository
@@ -36,6 +41,24 @@ namespace todo_api.Repository
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+        public async Task<long> GetAllTaskCountByUserIdAsync(long UserId)
+        {
+            try
+            {
+                string sql = "SELECT COUNT(*) FROM dbo.tblTask AS t WHERE t.UserId = @UserId AND t.isActive = 1";
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    connection.Open();
+                    var res = await connection.QueryFirstOrDefaultAsync<long>(sql,new { UserId });
+                    return res;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
         public async Task<List<GetAllTaskModel>> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm,TaskSortingModel? taskSorting, long PageNo, long PageSize)
@@ -76,16 +99,12 @@ namespace todo_api.Repository
                         if (add) sql += " ,";
                         sql += "t.CreationDateTime "+taskSorting.creationDate;
                         add = true;
-                    }
-                    
-                    
+                    }   
                 }
-                         
 
-                if (OFFSET != 0 && FETCH != 0)
-                {
-                    sql += " OFFSET @OFFSET ROWS FETCH NEXT @FETCH ROWS ONLY";
-                }
+                
+                sql += " OFFSET @OFFSET ROWS FETCH NEXT @FETCH ROWS ONLY";
+                
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
@@ -164,6 +183,27 @@ namespace todo_api.Repository
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+        public async Task<TaskReportModel> UserTaskReportAsync(long UserId)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    connection.Open();
+
+                    using (var multiResult = await connection.QueryMultipleAsync("dbo.todoReport", new { UserId}, commandType: CommandType.StoredProcedure))
+                    {
+                        var taskReportModel = await multiResult.ReadFirstOrDefaultAsync<TaskReportModel>() ?? new TaskReportModel();
+                        taskReportModel.TaskPriorityWiseReport = (await multiResult.ReadAsync<PriorityWiseTaskModel>()).ToList();
+                        return taskReportModel;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }

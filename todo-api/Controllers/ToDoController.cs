@@ -52,5 +52,12 @@ namespace todo_api.Controllers
             var res = await _Itodo.DeleteTaskByTaskIdAsync(TaskId);
             return Ok(res);
         }
+        [HttpGet]
+        [Route("UserTaskReport")]
+        public async Task<IActionResult> UserTaskReport(long UserId)
+        {
+            var res = await _Itodo.UserTaskReport(UserId);
+            return Ok(res);
+        }
     }
 }

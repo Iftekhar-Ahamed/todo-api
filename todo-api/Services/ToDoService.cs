@@ -3,6 +3,9 @@ using todo_api.IRepository;
 using todo_api.Model.TodoModel;
 using todo_api.Model;
 using todo_api.IService;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using todo_api.Model.ReportModel;
 
 namespace todo_api.Services
 {
@@ -29,8 +32,10 @@ namespace todo_api.Services
         }
         public async Task<PaginationLandingModel> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm, TaskSortingModel taskSorting, long PageNo, long PageSize)
         {
+
             var res = await db.GetAllTaskByUserIdAsync(UserId,SearchTerm, taskSorting, PageNo, PageSize);
-            PaginationLandingModel pagination = new PaginationLandingModel(res, PageNo, res.Count, PageSize);
+            var TotalRow = await db.GetAllTaskCountByUserIdAsync(UserId);
+            PaginationLandingModel pagination = new PaginationLandingModel(res, PageNo,TotalRow , PageSize);
             return pagination;
         }
         public async Task<List<CommonDDL>> GetPriorityDDLAsync(string OrderBy)
@@ -69,6 +74,10 @@ namespace todo_api.Services
                 msg.StatusCode = 400;
             }
             return msg;
+        }
+        public async Task<TaskReportModel> UserTaskReport(long UserId)
+        {
+            return await db.UserTaskReportAsync(UserId);
         }
     }
 }
