@@ -43,6 +43,11 @@ namespace todo_api.Services
             var res = await db.GetPriorityDDLAsync(OrderBy);
             return res;
         }
+        public async Task<List<CommonDDL>> GetAllUserDDL(string OrderBy)
+        {
+            var res = await db.GetAllUserDDLAsync(OrderBy);
+            return res;
+        }
         public async Task<MessageHelperModel> UpdateTaskByTaskIdAsync(UpdateTaskModel UpdateTaskModel)
         {
             var res = await db.UpdateTaskByTaskIdAsync(UpdateTaskModel);

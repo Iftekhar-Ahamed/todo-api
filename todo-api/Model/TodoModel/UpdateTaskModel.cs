@@ -19,6 +19,7 @@ namespace todo_api.Model.TodoModel
         [DataType(DataType.DateTime)]
         public DateTime ExpireDateTime { get; set; }
         public long PriorityId { get; set; }
+        public long AssignedId {  get; set; }
         public bool Status { get; set; }
     }
 }

@@ -11,6 +11,7 @@ namespace todo_api.IRepository
         Task<long> GetAllTaskCountByUserIdAsync(long UserId);
         Task<List<GetAllTaskModel>> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm, TaskSortingModel? taskSorting, long PageNo, long PageSize);
         Task<List<CommonDDL>> GetPriorityDDLAsync(string OrderBy);
+        Task<List<CommonDDL>> GetAllUserDDLAsync(string OrderBy);
         Task<long> UpdateTaskByTaskIdAsync(UpdateTaskModel updateTaskModel);
         Task<long> DeleteTaskByTaskIdAsync(long TaskId);
         Task<TaskReportModel> UserTaskReportAsync(long UserId);

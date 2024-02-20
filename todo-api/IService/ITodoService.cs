@@ -10,6 +10,7 @@ namespace todo_api.IService
         Task<MessageHelperModel> CreateTaskAsync(CreateTaskModel createTaskModel);
         Task<PaginationLandingModel> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm, TaskSortingModel taskSorting, long PageNo, long PageSize);
         Task<List<CommonDDL>> GetPriorityDDLAsync(string OrderBy);
+        Task<List<CommonDDL>> GetAllUserDDL(string OrderBy);
         Task<MessageHelperModel> UpdateTaskByTaskIdAsync(UpdateTaskModel updateTaskModel);
         Task<MessageHelperModel> DeleteTaskByTaskIdAsync(long TaskId);
         Task<TaskReportModel> UserTaskReport(long UserId);

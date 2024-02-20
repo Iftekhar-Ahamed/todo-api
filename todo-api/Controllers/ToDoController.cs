@@ -23,6 +23,7 @@ namespace todo_api.Controllers
             var res = await _Itodo.CreateTaskAsync(createTaskModel);
             return Ok(res);
         }
+        [AllowAnonymous]
         [HttpGet]
         [Route("GetAllTaskByUserId")]
         public async Task<IActionResult> GetAllTaskByUserId(long UserId, string? SearchTerm, [FromQuery] TaskSortingModel taskSorting, long PageNo, long PageSize)
@@ -36,6 +37,14 @@ namespace todo_api.Controllers
         {
 
             var res = await _Itodo.GetPriorityDDLAsync(OrderBy);
+            return Ok(res);
+        }
+        [HttpGet]
+        [Route("GetAllUserDDL")]
+        public async Task<IActionResult> GetAllUserDDL(string OrderBy)
+        {
+
+            var res = await _Itodo.GetAllUserDDL(OrderBy);
             return Ok(res);
         }
         [HttpPost]

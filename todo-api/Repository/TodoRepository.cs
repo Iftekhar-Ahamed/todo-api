@@ -27,9 +27,9 @@ namespace todo_api.Repository
             try
             {
                 var sql = "INSERT INTO [dbo].[tblTask] " +
-                          "([PriorityId],[TaskName],[TaskDescription],[UserId],[CreationDateTime],[ExpireDateTime],[Status],[isActive])" +
+                          "([PriorityId],[TaskName],[TaskDescription],[UserId],[CreationDateTime],[ExpireDateTime],[Status],[isActive],[CreateBy],[Assigned])" +
                           "VALUES" +
-                "(@PriorityId,@TaskName,@TaskDescription,@UserId,@CreationDateTime,@ExpireDateTime,@Status,1)";
+                "(@PriorityId,@TaskName,@TaskDescription,@UserId,@CreationDateTime,@ExpireDateTime,@Status,1,@CreatorId,@AssignedId)";
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
@@ -67,49 +67,14 @@ namespace todo_api.Repository
             {
                 var FETCH = PageSize;
                 var OFFSET = PageNo * PageSize;
-                var sql = "SELECT " +
-                         "t.TaskId as TaskId, t.PriorityId as PriorityId, p.PriorityName as PriorityName, " +
-                         "t.TaskName as TaskName, t.TaskDescription as TaskDescription, t.UserId as UserId, " +
-                         "t.ExpireDateTime as ExpireDateTime, t.CreationDateTime as CreationDateTime, t.Status as Status " +
-                         "FROM dbo.tblTask as t " +
-                         "INNER JOIN dbo.tblPriority as p on t.PriorityId = p.Priority " +
-                         "WHERE t.UserId = @UserId AND t.isActive = 1  ";
-                if (SearchTerm != null)
-                {
-                    sql += "AND t.TaskName Like '%"+SearchTerm+"%'";
-                }
-                    if (taskSorting != null && (taskSorting.Priority != null || taskSorting.creationDate != null || taskSorting.Status!= null))
-                {
-                    sql += "ORDER BY ";
-                    bool add = false;
-                    if (taskSorting.Status != null)
-                    {
-                        if (add) sql += " ,";
-                        sql += " t.Status " + taskSorting.Status;
-                        add = true;
-                    }
-                    if (taskSorting.Priority != null)
-                    {
-                        if (add) sql += " ,";
-                        sql += " t.PriorityId " + taskSorting.Priority;
-                        add = true;
-                    }
-                    if (taskSorting.creationDate != null)
-                    {
-                        if (add) sql += " ,";
-                        sql += "t.CreationDateTime "+taskSorting.creationDate;
-                        add = true;
-                    }   
-                }
-
                 
-                sql += " OFFSET @OFFSET ROWS FETCH NEXT @FETCH ROWS ONLY";
                 
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     connection.Open();
-                    var res = await connection.QueryAsync<GetAllTaskModel>(sql, new { UserId, OFFSET, FETCH,taskSorting?.Priority,taskSorting?.creationDate, taskSorting?.Status,SearchTerm });
+                   var res = await connection.QueryAsync<GetAllTaskModel>("GetAllTask", new { UserId, OFFSET, FETCH, taskSorting?.Status,SearchTerm, taskSorting?.Priority, taskSorting?.creationDate},commandType: CommandType.StoredProcedure);
+                    
                     return res.ToList();
                 }
 
@@ -136,6 +101,26 @@ namespace todo_api.Repository
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            
+            }
+        }
+        public async Task<List<CommonDDL>> GetAllUserDDLAsync(string OrderBy)
+        {
+            try
+            {
+                var sql = "SELECT UserId AS value,FirstName+'['+CAST(UserId AS varchar)+']' as name FROM dbo.tblUser WHERE isActive = 1 ORDER BY UserId " + OrderBy;
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    connection.Open();
+                    var result = await connection.QueryAsync<CommonDDL>(sql, new { OrderBy });
+
+                    return result.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
         public async Task<long> UpdateTaskByTaskIdAsync(UpdateTaskModel updateTaskModel)
@@ -148,6 +133,7 @@ namespace todo_api.Repository
                             "[ExpireDateTime] = @ExpireDateTime," +
                             "[Status] = @Status," +
                             "[PriorityId] = @PriorityId," +
+                            "[Assigned] = @AssignedId," +
                             "[CreationDateTime] = @CreationDateTime " +
                 "WHERE [TaskId] = @TaskId";
 

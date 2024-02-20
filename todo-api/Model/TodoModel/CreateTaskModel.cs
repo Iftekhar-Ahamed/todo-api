@@ -21,5 +21,9 @@ namespace todo_api.Model.TodoModel
         [Required]
         [DataType(DataType.DateTime)]
         public DateTime CreationDateTime { get; set;}
+        [Required]
+        public long CreatorId { get; set; }
+        [Required]
+        public long AssignedId { get; set; }
     }
 }
