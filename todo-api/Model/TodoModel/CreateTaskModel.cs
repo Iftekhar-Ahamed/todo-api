@@ -5,6 +5,7 @@ namespace todo_api.Model.TodoModel
     public class CreateTaskModel
     {
         [Required]
+        [Range(1, long.MaxValue, ErrorMessage = "Please enter Priority value bigger than {1}")]
         public long PriorityId { get; set; }
         [Required]
         [StringLength(50)]

@@ -34,8 +34,7 @@ namespace todo_api.Services
         {
 
             var res = await db.GetAllTaskByUserIdAsync(UserId,SearchTerm, taskSorting, PageNo, PageSize);
-            var TotalRow = await db.GetAllTaskCountByUserIdAsync(UserId);
-            PaginationLandingModel pagination = new PaginationLandingModel(res, PageNo,TotalRow , PageSize);
+            PaginationLandingModel pagination = new PaginationLandingModel(res.TaskList, PageNo,res.TaskCount , PageSize);
             return pagination;
         }
         public async Task<List<CommonDDL>> GetPriorityDDLAsync(string OrderBy)

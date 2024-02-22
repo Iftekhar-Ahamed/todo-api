@@ -3,6 +3,8 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using System.Diagnostics;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using todo_api.Helper;
@@ -21,13 +23,13 @@ namespace todo_api.Repository
         {
             this._configuration = configuration;
         }
-        
+
         public async Task<long> CreateTaskAsync(CreateTaskModel createTaskModel)
         {
             try
             {
                 var sql = "INSERT INTO [dbo].[tblTask] " +
-                          "([PriorityId],[TaskName],[TaskDescription],[UserId],[CreationDateTime],[ExpireDateTime],[Status],[isActive],[CreateBy],[Assigned])" +
+                          "([PriorityId],[TaskName],[TaskDescription],[UserId],[CreationDateTime],[ExpireDateTime],[TaskStatus],[isActive],[CreateBy],[Assigned])" +
                           "VALUES" +
                 "(@PriorityId,@TaskName,@TaskDescription,@UserId,@CreationDateTime,@ExpireDateTime,@Status,1,@CreatorId,@AssignedId)";
 
@@ -51,7 +53,7 @@ namespace todo_api.Repository
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     connection.Open();
-                    var res = await connection.QueryFirstOrDefaultAsync<long>(sql,new { UserId });
+                    var res = await connection.QueryFirstOrDefaultAsync<long>(sql, new { UserId });
                     return res;
                 }
 
@@ -61,7 +63,7 @@ namespace todo_api.Repository
                 throw ex;
             }
         }
-        public async Task<List<GetAllTaskModel>> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm,TaskSortingModel? taskSorting, long PageNo, long PageSize)
+        public async Task<TaskListWithCountModel> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm,TaskSortingModel? taskSorting, long PageNo, long PageSize)
         {
             try
             {
@@ -73,9 +75,17 @@ namespace todo_api.Repository
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     connection.Open();
-                   var res = await connection.QueryAsync<GetAllTaskModel>("GetAllTask", new { UserId, OFFSET, FETCH, taskSorting?.Status,SearchTerm, taskSorting?.Priority, taskSorting?.creationDate},commandType: CommandType.StoredProcedure);
-                    
-                    return res.ToList();
+                    using (var multiResult = await connection.QueryMultipleAsync("GetAllTask", new { UserId, OFFSET, FETCH, taskSorting?.Status, SearchTerm, taskSorting?.Priority, taskSorting?.creationDate }, commandType: CommandType.StoredProcedure))
+                    {
+                        var taskList = await multiResult.ReadAsync<GetAllTaskModel>();
+                        var TotalRows = await multiResult.ReadSingleAsync<long>();
+
+                        return new TaskListWithCountModel
+                        {
+                            TaskList = taskList.ToList(),
+                            TaskCount = TotalRows
+                        };
+                    }
                 }
 
             }
@@ -127,27 +137,29 @@ namespace todo_api.Repository
         {
             try
             {
-                var sql = "UPDATE [TODO].[dbo].[tblTask]" +
-                            "SET [TaskName] = @TaskName," +
-                            "[TaskDescription] = @TaskDescription," +
-                            "[ExpireDateTime] = @ExpireDateTime," +
-                            "[Status] = @Status," +
-                            "[PriorityId] = @PriorityId," +
-                            "[Assigned] = @AssignedId," +
-                            "[CreationDateTime] = @CreationDateTime " +
-                "WHERE [TaskId] = @TaskId";
+
+                var sql = @"UPDATE [TODO].[dbo].[tblTask]
+                             SET [TaskName] = @TaskName, 
+                            [TaskDescription] = @TaskDescription,
+                            [ExpireDateTime] = @ExpireDateTime,
+                            [TaskStatus] = @Status,
+                            [PriorityId] = @PriorityId,
+                            [Assigned] = @AssignedId,
+                            [CreationDateTime] = @CreationDateTime,
+                            [EditedBy]= @UserId
+                           WHERE [TaskId] = @TaskId";
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     connection.Open();
-                    var res = await connection.ExecuteAsync(sql, updateTaskModel);
+                    var res = await connection.ExecuteAsync(sql, updateTaskModel );
 
                     return res;
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw ;
             }
         }
         public async Task<long> DeleteTaskByTaskIdAsync(long TaskId)

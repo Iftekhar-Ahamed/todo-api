@@ -12,6 +12,7 @@ namespace todo_api.Controllers
     public class ToDoController: ControllerBase
     {
         private ITodoService _Itodo;
+
         public ToDoController(ITodoService todo)
         {
             _Itodo = todo;
@@ -23,7 +24,6 @@ namespace todo_api.Controllers
             var res = await _Itodo.CreateTaskAsync(createTaskModel);
             return Ok(res);
         }
-        [AllowAnonymous]
         [HttpGet]
         [Route("GetAllTaskByUserId")]
         public async Task<IActionResult> GetAllTaskByUserId(long UserId, string? SearchTerm, [FromQuery] TaskSortingModel taskSorting, long PageNo, long PageSize)

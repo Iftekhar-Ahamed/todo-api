@@ -21,5 +21,7 @@ namespace todo_api.Model.TodoModel
         public long PriorityId { get; set; }
         public long AssignedId {  get; set; }
         public bool Status { get; set; }
+        [Required]
+        public long UserId { get; set; }
     }
 }
