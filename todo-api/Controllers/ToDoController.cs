@@ -11,24 +11,24 @@ namespace todo_api.Controllers
     [Route("[controller]")]
     public class ToDoController: ControllerBase
     {
-        private ITodoService _Itodo;
+        private IUnitOfWorkService _UnitOfWorkService;
 
-        public ToDoController(ITodoService todo)
+        public ToDoController(IUnitOfWorkService unitOfWorkService)
         {
-            _Itodo = todo;
+            _UnitOfWorkService = unitOfWorkService;
         }
         [HttpPost]
         [Route("CreateTask")]
         public async Task<IActionResult> CreateTask(CreateTaskModel createTaskModel)
         {
-            var res = await _Itodo.CreateTaskAsync(createTaskModel);
+            var res = await _UnitOfWorkService.TodoService.CreateTaskAsync(createTaskModel);
             return Ok(res);
         }
         [HttpGet]
         [Route("GetAllTaskByUserId")]
         public async Task<IActionResult> GetAllTaskByUserId(long UserId, string? SearchTerm, [FromQuery] TaskSortingModel taskSorting, long PageNo, long PageSize)
         {
-            var res = await _Itodo.GetAllTaskByUserIdAsync(UserId, SearchTerm, taskSorting, PageNo, PageSize);
+            var res = await _UnitOfWorkService.TodoService.GetAllTaskByUserIdAsync(UserId, SearchTerm, taskSorting, PageNo, PageSize);
             return Ok(res);
         }
         [HttpGet]
@@ -36,7 +36,7 @@ namespace todo_api.Controllers
         public async Task<IActionResult> GetPriorityDDL(string OrderBy)
         {
 
-            var res = await _Itodo.GetPriorityDDLAsync(OrderBy);
+            var res = await _UnitOfWorkService.TodoService.GetPriorityDDLAsync(OrderBy);
             return Ok(res);
         }
         [HttpGet]
@@ -44,28 +44,28 @@ namespace todo_api.Controllers
         public async Task<IActionResult> GetAllUserDDL(string OrderBy)
         {
 
-            var res = await _Itodo.GetAllUserDDL(OrderBy);
+            var res = await _UnitOfWorkService.TodoService.GetAllUserDDL(OrderBy);
             return Ok(res);
         }
         [HttpPost]
         [Route("UpdateTaskByTaskId")]
         public async Task<IActionResult> UpdateTaskByTaskId(UpdateTaskModel createTaskModel)
         {
-            var res = await _Itodo.UpdateTaskByTaskIdAsync(createTaskModel);
+            var res = await _UnitOfWorkService.TodoService.UpdateTaskByTaskIdAsync(createTaskModel);
             return Ok(res);
         }
         [HttpPost]
         [Route("DeleteTaskByTaskId")]
         public async Task<IActionResult> DeleteTaskByTaskId( [FromBody]long TaskId)
         {
-            var res = await _Itodo.DeleteTaskByTaskIdAsync(TaskId);
+            var res = await _UnitOfWorkService.TodoService.DeleteTaskByTaskIdAsync(TaskId);
             return Ok(res);
         }
         [HttpGet]
         [Route("UserTaskReport")]
         public async Task<IActionResult> UserTaskReport(long UserId)
         {
-            var res = await _Itodo.UserTaskReport(UserId);
+            var res = await _UnitOfWorkService.TodoService.UserTaskReport(UserId);
             return Ok(res);
         }
     }

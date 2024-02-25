@@ -9,15 +9,15 @@ namespace todo_api.Controllers
     [Route("[controller]")]
     public class AuthController: ControllerBase
     {
-        private IAuthenticationService _IAuthentication;
-        public AuthController(IAuthenticationService athentication) {
-            _IAuthentication = athentication;
+        private IUnitOfWorkService  _unitOfWorkService;
+        public AuthController(IUnitOfWorkService unitOfWorkService) {
+            _unitOfWorkService = unitOfWorkService;
         }
         [HttpGet]
         [Route("LogIn")]
         public async Task<IActionResult> LogIn([MaxLength(20)] string UserName, [MaxLength(16)] string PassWord)
         {
-            var res = await _IAuthentication.UserLogInAsync(UserName, PassWord);
+            var res = await _unitOfWorkService.Authentication.UserLogInAsync(UserName, PassWord);
             return Ok(Ok(new { UserInfo = res.Item1, Message = res.Item2 }));
         }
     }

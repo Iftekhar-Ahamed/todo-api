@@ -9,11 +9,8 @@ namespace todo_api
     {
         public static void AddInfrastructure(this IServiceCollection services)
         {
-            services.AddScoped<IAuthentication, AuthenticationRepository>();
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
-
-            services.AddScoped<ITodo, TodoRepository>();
-            services.AddScoped<ITodoService, ToDoService>();
+            services.AddScoped<IUnitOfWorkRepository, UnitOfWorkRepository>();
+            services.AddScoped<IUnitOfWorkService, UnitOfWorkService>();
         }
     }
 }

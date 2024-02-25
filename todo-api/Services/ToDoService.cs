@@ -6,18 +6,19 @@ using todo_api.IService;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using todo_api.Model.ReportModel;
+using todo_api.Repository;
 
 namespace todo_api.Services
 {
     public class ToDoService: ITodoService
     {
-        public readonly ITodo db;
-        public ToDoService(ITodo todo) {
-            db = todo;
+        public readonly IUnitOfWorkRepository _UnitOfWorkRepository;
+        public ToDoService(IUnitOfWorkRepository unitOfWorkRepository) {
+            _UnitOfWorkRepository = unitOfWorkRepository;
         }
         public async Task<MessageHelperModel> CreateTaskAsync(CreateTaskModel CreateTaskModel)
         {
-            var res =await db.CreateTaskAsync(CreateTaskModel);
+            var res =await _UnitOfWorkRepository.Todo.CreateTaskAsync(CreateTaskModel);
             var msg = new MessageHelperModel { StatusCode = 200, Message = "" };
             if (res == 0)
             {
@@ -33,23 +34,23 @@ namespace todo_api.Services
         public async Task<PaginationLandingModel> GetAllTaskByUserIdAsync(long UserId, string? SearchTerm, TaskSortingModel taskSorting, long PageNo, long PageSize)
         {
 
-            var res = await db.GetAllTaskByUserIdAsync(UserId,SearchTerm, taskSorting, PageNo, PageSize);
+            var res = await _UnitOfWorkRepository.Todo.GetAllTaskByUserIdAsync(UserId,SearchTerm, taskSorting, PageNo, PageSize);
             PaginationLandingModel pagination = new PaginationLandingModel(res.TaskList, PageNo,res.TaskCount , PageSize);
             return pagination;
         }
         public async Task<List<CommonDDL>> GetPriorityDDLAsync(string OrderBy)
         {
-            var res = await db.GetPriorityDDLAsync(OrderBy);
+            var res = await _UnitOfWorkRepository.Todo.GetPriorityDDLAsync(OrderBy);
             return res;
         }
         public async Task<List<CommonDDL>> GetAllUserDDL(string OrderBy)
         {
-            var res = await db.GetAllUserDDLAsync(OrderBy);
+            var res = await _UnitOfWorkRepository.Todo.GetAllUserDDLAsync(OrderBy);
             return res;
         }
         public async Task<MessageHelperModel> UpdateTaskByTaskIdAsync(UpdateTaskModel UpdateTaskModel)
         {
-            var res = await db.UpdateTaskByTaskIdAsync(UpdateTaskModel);
+            var res = await _UnitOfWorkRepository.Todo.UpdateTaskByTaskIdAsync(UpdateTaskModel);
             MessageHelperModel msg = new MessageHelperModel();
             if (res > 0)
             {
@@ -65,7 +66,7 @@ namespace todo_api.Services
         }
         public async Task<MessageHelperModel> DeleteTaskByTaskIdAsync(long TaskId)
         {
-            var res = await db.DeleteTaskByTaskIdAsync(TaskId);
+            var res = await _UnitOfWorkRepository.Todo.DeleteTaskByTaskIdAsync(TaskId);
             MessageHelperModel msg = new MessageHelperModel();
             if (res > 0)
             {
@@ -81,7 +82,7 @@ namespace todo_api.Services
         }
         public async Task<TaskReportModel> UserTaskReport(long UserId)
         {
-            return await db.UserTaskReportAsync(UserId);
+            return await _UnitOfWorkRepository.Todo.UserTaskReportAsync(UserId);
         }
     }
 }
