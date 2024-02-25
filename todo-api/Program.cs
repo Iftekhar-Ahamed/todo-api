@@ -43,7 +43,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
+builder.Services.AddMemoryCache();
 builder.Services.AddInfrastructure();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -80,6 +80,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowOrigin");
 
 app.UseHttpsRedirection();
+app.UseCustomAuthorization();
 app.UseAuthentication();
 app.UseAuthorization();
 

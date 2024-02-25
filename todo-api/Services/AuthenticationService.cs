@@ -46,7 +46,7 @@ namespace todo_api.Services
         }
         public string GenerateToken(UserInfoModel user)
         {
-            var claims = new List<Claim>{new Claim(ClaimTypes.Name, user.FirstName), new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()) };
+            var claims = new List<Claim>{new Claim(ClaimTypes.Name, user.FirstName), new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())};
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
